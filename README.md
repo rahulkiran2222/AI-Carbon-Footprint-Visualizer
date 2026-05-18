@@ -36,7 +36,7 @@ This project provides an interactive **3D kinetic engine** that transforms abstr
 
 The system calculates the **Carbon Footprint ($C$)** using the following logic:
 
-```math
+
 C = \left( \frac{TDP \times Utilization \times PUE}{1000} \right) \times Intensity
 TDP (Thermal Design Power): The peak power draw of the selected GPU.
 
