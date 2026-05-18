@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Carbon Visualizer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; background: #020617; overflow: hidden; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
+        .ui-overlay { position: relative; z-index: 10; pointer-events: none; }
+        .interactive { pointer-events: auto; }
+    </style>
+</head>
+<body>
+    <div class="ui-overlay p-8 flex flex-col h-screen justify-between">
+        <div class="flex justify-between items-start">
+            <div class="glass p-6 rounded-2xl w-80">
+                <h1 class="text-xl font-bold mb-4 text-cyan-400">AI ENERGY CORE</h1>
+                
+                <label class="text-xs uppercase tracking-widest text-slate-400">Model Scale (Params)</label>
+                <input type="range" id="modelScale" min="1" max="175" value="7" class="w-full mb-4 interactive">
+                
+                <label class="text-xs uppercase tracking-widest text-slate-400">Hardware Cluster</label>
+                <select id="hwType" class="w-full bg-slate-800 p-2 rounded mb-4 interactive text-sm">
+                    <option value="NVIDIA_H100">8x NVIDIA H100 (Enterprise)</option>
+                    <option value="NVIDIA_A100" selected>1x NVIDIA A100 (Standard)</option>
+                    <option value="NVIDIA_T4">1x NVIDIA T4 (Edge)</option>
+                </select>
+
+                <label class="text-xs uppercase tracking-widest text-slate-400">Grid Carbon Intensity</label>
+                <input type="range" id="carbonInt" min="50" max="800" value="400" class="w-full interactive">
+            </div>
+
+            <div class="glass p-6 rounded-2xl w-64 text-right">
+                <div class="mb-4">
+                    <p class="text-xs text-slate-400">POWER CONSUMPTION</p>
+                    <h2 id="out-watt" class="text-3xl font-mono text-yellow-400">0W</h2>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400">CARBON FOOTPRINT</p>
+                    <h2 id="out-co2" class="text-3xl font-mono text-red-500">0 g/h</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass p-4 rounded-xl self-center text-sm text-slate-400">
+            Real-time Neural Simulation: <span id="out-lat" class="text-cyan-400 font-mono">0ms</span> latency
+        </div>
+    </div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
