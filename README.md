@@ -38,3 +38,52 @@ The system calculates the **Carbon Footprint ($C$)** using the following logic:
 
 ```math
 C = \left( \frac{TDP \times Utilization \times PUE}{1000} \right) \times Intensity
+TDP (Thermal Design Power): The peak power draw of the selected GPU.
+
+PUE (Power Usage Effectiveness): Fixed at 1.6 to account for data center cooling overhead.
+
+Grid Intensity: Regional carbon cost per kilowatt-hour.
+
+🏗 Project Structure
+code
+Text
+├── app.py              # FastAPI Backend (Mathematical Logic)
+├── Dockerfile          # Container configuration
+├── requirements.txt    # Python dependencies
+└── static/             
+    ├── index.html      # 3D Render & UI Overlay
+    └── script.js       # Three.js Particle Engine
+🛣 Future Roadmap
+
+Live Grid API: Integration with real-time global energy maps.
+
+Multi-GPU Clusters: Visualizing the impact of training 1,000+ GPU nodes.
+
+Expanded Hardware: Adding support for AMD Instinct and Google TPU profiles.
+
+Mobile Optimization: AR-view support for the Energy Core.
+💻 Local Setup
+Clone the repository:
+
+code
+Bash
+git clone https://github.com/RahulGK/AI-Carbon-Visualizer.git
+cd AI-Carbon-Visualizer
+Install dependencies:
+
+code
+Bash
+pip install -r requirements.txt
+Launch the visualizer:
+
+code
+Bash
+python app.py
+Visit http://localhost:7860 in your browser.
+
+👤 Author
+Rahul Kiran G.
+AI Developer & Researcher
+
+"Making the invisible costs of Artificial Intelligence visible for a sustainable future."
+Developed for the Hugging Face Open Science community.
