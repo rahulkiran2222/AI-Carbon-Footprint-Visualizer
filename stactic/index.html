@@ -1,57 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>AI Carbon Visualizer Pro</title>
+    <title>AI Carbon Visualizer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; background: #020617; overflow: hidden; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        canvas { position: absolute; top: 0; left: 0; z-index: 1; }
-        .ui-overlay { position: relative; z-index: 10; pointer-events: none; }
-        .interactive { pointer-events: auto; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: monospace; }
+        .glass { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: 1px solid #333; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <div class="ui-overlay p-8 flex flex-col h-screen justify-between">
-        <div class="flex justify-between items-start">
-            <div class="glass p-6 rounded-2xl w-80">
-                <h1 class="text-xl font-bold mb-4 text-cyan-400">AI ENERGY CORE</h1>
-                
-                <label class="text-xs uppercase tracking-widest text-slate-400">Model Scale (Params)</label>
-                <input type="range" id="modelScale" min="1" max="175" value="7" class="w-full mb-4 interactive">
-                
-                <label class="text-xs uppercase tracking-widest text-slate-400">Hardware Cluster</label>
-                <select id="hwType" class="w-full bg-slate-800 p-2 rounded mb-4 interactive text-sm">
-                    <option value="NVIDIA_H100">8x NVIDIA H100 (Enterprise)</option>
-                    <option value="NVIDIA_A100" selected>1x NVIDIA A100 (Standard)</option>
-                    <option value="NVIDIA_T4">1x NVIDIA T4 (Edge)</option>
-                </select>
+    <div class="absolute z-10 p-6 w-full flex justify-between pointer-events-none">
+        <div class="glass p-6 rounded-lg pointer-events-auto w-80 text-white">
+            <h1 class="text-green-400 font-bold text-xl mb-4">NEURAL ENERGY CORE v1.0</h1>
+            
+            <label class="text-xs text-gray-400">MODEL SIZE (BILLIONS)</label>
+            <input type="range" id="size" min="1" max="175" value="7" class="w-full mb-4 cursor-pointer">
+            
+            <label class="text-xs text-gray-400">HARDWARE CLUSTER</label>
+            <select id="hw" class="w-full bg-black border border-gray-700 p-2 mb-4 text-sm">
+                <option value="NVIDIA_H100">8x NVIDIA H100 (Enterprise)</option>
+                <option value="NVIDIA_A100" selected>1x NVIDIA A100 (Standard)</option>
+                <option value="NVIDIA_T4">1x NVIDIA T4 (Edge)</option>
+            </select>
 
-                <label class="text-xs uppercase tracking-widest text-slate-400">Grid Carbon Intensity</label>
-                <input type="range" id="carbonInt" min="50" max="800" value="400" class="w-full interactive">
-            </div>
-
-            <div class="glass p-6 rounded-2xl w-64 text-right">
-                <div class="mb-4">
-                    <p class="text-xs text-slate-400">POWER CONSUMPTION</p>
-                    <h2 id="out-watt" class="text-3xl font-mono text-yellow-400">0W</h2>
-                </div>
-                <div>
-                    <p class="text-xs text-slate-400">CARBON FOOTPRINT</p>
-                    <h2 id="out-co2" class="text-3xl font-mono text-red-500">0 g/h</h2>
-                </div>
-            </div>
+            <label class="text-xs text-gray-400">GRID CARBON INTENSITY (gCO2/kWh)</label>
+            <input type="range" id="carbon" min="50" max="800" value="400" class="w-full mb-4 cursor-pointer">
         </div>
 
-        <div class="glass p-4 rounded-xl self-center text-sm text-slate-400">
-            Real-time Neural Simulation: <span id="out-lat" class="text-cyan-400 font-mono">0ms</span> latency
+        <div class="glass p-6 rounded-lg w-64 text-right text-white">
+            <p class="text-xs text-gray-400 uppercase">Current Power Draw</p>
+            <h2 id="disp-pwr" class="text-3xl text-yellow-400 mb-4 font-bold">0W</h2>
+            <p class="text-xs text-gray-400 uppercase">Carbon Emission</p>
+            <h2 id="disp-co2" class="text-3xl text-red-500 font-bold">0 g/h</h2>
         </div>
     </div>
 
     <script type="importmap">
         { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
     </script>
-    <script type="module" src="script.js"></script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        let scene, camera, renderer, core, particles, light;
+        
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // AI Core
+            const geo = new THREE.IcosahedronGeometry(2, 1);
+            const mat = new THREE.MeshStandardMaterial({ color: 0x00ff88, wireframe: true });
+            core = new THREE.Mesh(geo, mat);
+            scene.add(core);
+
+            // Particles
+            const pGeo = new THREE.BufferGeometry();
+            const pPos = new Float32Array(3000);
+            for(let i=0; i<3000; i++) pPos[i] = (Math.random()-0.5) * 20;
+            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+            particles = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0x00ff88, size: 0.05}));
+            scene.add(particles);
+
+            light = new THREE.PointLight(0x00ff88, 50, 100);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0x111111));
+
+            camera.position.z = 8;
+            update();
+        }
+
+        async function update() {
+            const data = {
+                model_size: parseFloat(document.getElementById('size').value),
+                hardware: document.getElementById('hw').value,
+                grid_intensity: parseFloat(document.getElementById('carbon').value)
+            };
+
+            const res = await fetch('/calculate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await res.json();
+
+            document.getElementById('disp-pwr').innerText = result.wattage + 'W';
+            document.getElementById('disp-co2').innerText = result.carbon + ' g/h';
+
+            // Change visual based on heat
+            const heat = result.heat;
+            core.material.color.setHSL(0.4 - (heat*0.4), 1, 0.5);
+            light.color.setHSL(0.4 - (heat*0.4), 1, 0.5);
+            core.scale.set(1+heat, 1+heat, 1+heat);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            core.rotation.y += 0.01;
+            
+            const positions = particles.geometry.attributes.position.array;
+            for(let i=0; i<positions.length; i+=3) {
+                positions[i+1] -= 0.05; // Fall down
+                if(positions[i+1] < -10) positions[i+1] = 10;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            
+            renderer.render(scene, camera);
+        }
+
+        document.querySelectorAll('input, select').forEach(el => el.oninput = update);
+        window.onresize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+
+        init();
+        animate();
+    </script>
 </body>
 </html>
